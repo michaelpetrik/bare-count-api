@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.env*
+.git
+.gitignore
+*.log
+__tests__
+*.test.*
+*.md
+Dockerfile*
+docker-compose* 
