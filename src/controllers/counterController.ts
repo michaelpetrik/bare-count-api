@@ -10,7 +10,7 @@ const jsonStore = new JsonStore();
 const timeProvider = new DefaultTimeProvider();
 const counterService = new CounterService(jsonStore, timeProvider);
 
-export const handleVisit = (_req: Request, res: Response) => {
+export const handleHit = (_req: Request, res: Response) => {
   const timestamp = timeProvider.getCurrentTimeIso();
 
   // IP –> Country
@@ -48,7 +48,7 @@ export const handleVisit = (_req: Request, res: Response) => {
   res.send('done');
 };
 
-export const getVisitCounts = (_req: Request, res: Response) => {
+export const getHitStats = (_req: Request, res: Response) => {
   const result = counterService.getVisitCounts();
   res.send(result);
 };

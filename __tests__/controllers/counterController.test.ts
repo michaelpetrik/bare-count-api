@@ -1,14 +1,14 @@
 import request from 'supertest';
 import express from 'express';
 import {
-  handleVisit,
-  getVisitCounts,
+  handleHit,
+  getHitStats,
 } from '../../src/controllers/counterController';
 
 // Create a test app
 const app = express();
-app.get('/test', handleVisit);
-app.get('/counts', getVisitCounts);
+app.get('/test', handleHit);
+app.get('/stats', getHitStats);
 describe('counterController', () => {
   describe('GET /test', () => {
     it('should respond with done and status 200', async () => {
@@ -29,12 +29,12 @@ describe('counterController', () => {
     });
   });
 });
-describe('getVisitCounts', () => {
+describe('getHitStats', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
   it('should respond with the correct visit counts', async () => {
     // Act
-    const response = await request(app).get('/counts').expect(200);
+    const response = await request(app).get('/stats').expect(200);
   });
 });

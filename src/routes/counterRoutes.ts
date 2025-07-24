@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { handleVisit, getVisitCounts } from '../controllers/counterController';
+import { handleHit, getHitStats } from '../controllers/counterController';
 
 const router = Router();
 
-router.get('/', handleVisit);
-router.get('/counts', getVisitCounts);
+router.get('/hit', handleHit);
+router.get('/stats', getHitStats);
 
 export default router;

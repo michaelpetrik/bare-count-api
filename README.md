@@ -2,6 +2,41 @@
 
 Minimalist but scalable self-hosted visit counter API written in TypeScript
 
+## API Usage
+
+### Endpoints
+
+#### Track Hit
+```
+GET /hit
+```
+
+Records a new page hit with automatically detected visitor information:
+- **IP-based country detection**
+- **User-Agent parsing** (browser, OS, device type)
+- **Language detection** from Accept-Language header
+- **Referrer tracking**
+- **Screen resolution** (optional GET parameter)
+
+**Optional Parameters:**
+- `screen`: Screen resolution in format `widthxheight` (e.g., `1920x1080`)
+
+**Example frontend usage:**
+```javascript
+// Track hit with screen resolution
+fetch(`/hit?screen=${window.innerWidth}x${window.innerHeight}`);
+
+// Or simple hit tracking
+fetch('/hit');
+```
+
+#### Get Statistics
+```
+GET /stats
+```
+
+Returns aggregated hit statistics in JSON format.
+
 ## Development
 
 ### Prerequisites
