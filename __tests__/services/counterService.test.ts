@@ -26,13 +26,22 @@ describe('CounterService', () => {
       // Arrange
       const fixedTime = '2024-12-25T10:00:00.000Z';
       mockTimeProvider.getCurrentTimeIso.mockReturnValue(fixedTime);
+      const visitData = {
+        timestamp: fixedTime,
+        country: 'CZ',
+        browser: 'Chrome',
+        os: 'Windows',
+        deviceType: 'desktop',
+        language: 'cs',
+        referrer: 'Direct',
+        screen: '1920x1080',
+      };
 
       // Act
-      counterService.recordVisit();
+      counterService.recordVisit(visitData);
 
       // Assert
-      expect(mockTimeProvider.getCurrentTimeIso).toHaveBeenCalledTimes(1);
-      expect(mockStore.recordVisit).toHaveBeenCalledWith(fixedTime);
+      expect(mockStore.recordVisit).toHaveBeenCalledWith(visitData);
       expect(mockStore.recordVisit).toHaveBeenCalledTimes(1);
     });
 
@@ -40,18 +49,24 @@ describe('CounterService', () => {
       // Arrange
       const firstTime = '2024-01-01T00:00:00.000Z';
       const secondTime = '2024-12-31T23:59:59.999Z';
-
-      mockTimeProvider.getCurrentTimeIso
-        .mockReturnValueOnce(firstTime)
-        .mockReturnValueOnce(secondTime);
+      const firstVisit = {
+        timestamp: firstTime,
+        country: 'US',
+        browser: 'Firefox',
+      };
+      const secondVisit = {
+        timestamp: secondTime,
+        country: 'DE',
+        browser: 'Safari',
+      };
 
       // Act
-      counterService.recordVisit();
-      counterService.recordVisit();
+      counterService.recordVisit(firstVisit);
+      counterService.recordVisit(secondVisit);
 
       // Assert
-      expect(mockStore.recordVisit).toHaveBeenNthCalledWith(1, firstTime);
-      expect(mockStore.recordVisit).toHaveBeenNthCalledWith(2, secondTime);
+      expect(mockStore.recordVisit).toHaveBeenNthCalledWith(1, firstVisit);
+      expect(mockStore.recordVisit).toHaveBeenNthCalledWith(2, secondVisit);
       expect(mockStore.recordVisit).toHaveBeenCalledTimes(2);
     });
   });
