@@ -1,6 +1,6 @@
 import { Visit } from '../../types/visit';
 
 export interface VisitStore {
-  recordVisit(timestamp: string): void;
+  recordVisit(visit: Visit): void;
   getAllVisits(): Visit[];
 }

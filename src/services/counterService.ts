@@ -1,11 +1,12 @@
 import { VisitStore } from '../storage/interfaces/visitStore';
+import { Visit } from '../types/visit';
 import { TimeProvider } from './interfaces/timeProvider';
 
 export class CounterService {
   constructor(private store: VisitStore, private timeProvider: TimeProvider) {}
 
-  recordVisit(): void {
-    this.store.recordVisit(this.timeProvider.getCurrentTimeIso());
+  recordVisit(visit: Visit): void {
+    this.store.recordVisit(visit);
   }
 
   getVisitCounts(): { total: number; today: number; last7Days: number } {

@@ -4,6 +4,6 @@ import counterRoutes from './routes/counterRoutes';
 const app = express();
 
 app.use(express.json());
-app.use('/api', counterRoutes);
+app.use('/', counterRoutes);
 
 export default app;

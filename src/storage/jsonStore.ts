@@ -24,10 +24,10 @@ export class JsonStore implements VisitStore {
     return data as Visit[];
   }
 
-  recordVisit(timestamp: string): void {
+  recordVisit(visit: Visit): void {
     this.ensureFileExists();
     const data = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
-    data.push({ timestamp });
+    data.push(visit);
     fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2));
   }
 }
