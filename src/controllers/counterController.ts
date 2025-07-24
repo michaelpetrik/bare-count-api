@@ -12,3 +12,8 @@ export const handleVisit = (_req: Request, res: Response) => {
   counterService.recordVisit();
   res.send('done');
 };
+
+export const getVisitCounts = (_req: Request, res: Response) => {
+  const result = counterService.getVisitCounts();
+  res.send(result);
+};
