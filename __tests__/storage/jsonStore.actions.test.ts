@@ -29,11 +29,14 @@ describe('JsonStore - Action Methods', () => {
       mockedFs.readFileSync.mockReturnValue(JSON.stringify(existingData));
 
       const action: Action = {
+        sessionId: '123',
+        elementId: 'signup-btn',
+        elementClass: 'btn',
+        scrollPosition: 100,
         name: 'newsletter_signup',
         type: 'click',
         timeToAction: 5000,
         timestamp: '2025-08-02T10:00:00.000Z',
-        elementId: 'signup-btn',
       };
 
       const expectedData = {
@@ -54,6 +57,10 @@ describe('JsonStore - Action Methods', () => {
     it('should append action to existing actions', () => {
       // Arrange
       const existingAction: Action = {
+        sessionId: '123',
+        elementId: 'signup-btn',
+        elementClass: 'btn',
+        scrollPosition: 100,
         name: 'existing_action',
         type: 'click',
         timeToAction: 3000,
@@ -68,6 +75,10 @@ describe('JsonStore - Action Methods', () => {
       mockedFs.readFileSync.mockReturnValue(JSON.stringify(existingData));
 
       const newAction: Action = {
+        sessionId: '123',
+        elementId: 'signup-btn',
+        elementClass: 'btn',
+        scrollPosition: 100,
         name: 'new_action',
         type: 'submit',
         timeToAction: 7000,
@@ -93,6 +104,7 @@ describe('JsonStore - Action Methods', () => {
       // Arrange - old format with just visits array
       const oldVisits: Visit[] = [
         {
+          sessionId: '123',
           timestamp: '2025-08-01T10:00:00.000Z',
           country: 'CZ',
           browser: 'Chrome',
@@ -102,6 +114,10 @@ describe('JsonStore - Action Methods', () => {
       mockedFs.readFileSync.mockReturnValue(JSON.stringify(oldVisits));
 
       const action: Action = {
+        sessionId: '123',
+        elementId: 'signup-btn',
+        elementClass: 'btn',
+        scrollPosition: 100,
         name: 'test_action',
         type: 'click',
         timeToAction: 5000,
@@ -132,6 +148,10 @@ describe('JsonStore - Action Methods', () => {
       mockedFs.readFileSync.mockReturnValue(JSON.stringify(initialData));
 
       const action: Action = {
+        sessionId: '123',
+        elementId: 'signup-btn',
+        elementClass: 'btn',
+        scrollPosition: 100,
         name: 'first_action',
         type: 'click',
         timeToAction: 2000,
@@ -165,12 +185,20 @@ describe('JsonStore - Action Methods', () => {
       // Arrange
       const actions: Action[] = [
         {
+          sessionId: '123',
+          elementId: 'signup-btn',
+          elementClass: 'btn',
+          scrollPosition: 100,
           name: 'action1',
           type: 'click',
           timeToAction: 1000,
           timestamp: '2025-08-01T10:00:00.000Z',
         },
         {
+          sessionId: '123',
+          elementId: 'signup-btn',
+          elementClass: 'btn',
+          scrollPosition: 100,
           name: 'action2',
           type: 'submit',
           timeToAction: 5000,
@@ -214,6 +242,7 @@ describe('JsonStore - Action Methods', () => {
       // Arrange - old format with just visits array
       const oldVisits: Visit[] = [
         {
+          sessionId: '123',
           timestamp: '2025-08-01T10:00:00.000Z',
           country: 'CZ',
         },
@@ -254,6 +283,7 @@ describe('JsonStore - Action Methods', () => {
       // Arrange
       const existingVisits: Visit[] = [
         {
+          sessionId: '123',
           timestamp: '2025-08-01T10:00:00.000Z',
           country: 'CZ',
           browser: 'Chrome',
@@ -262,6 +292,10 @@ describe('JsonStore - Action Methods', () => {
 
       const existingActions: Action[] = [
         {
+          sessionId: '123',
+          elementId: 'signup-btn',
+          elementClass: 'btn',
+          scrollPosition: 100,
           name: 'existing_action',
           type: 'click',
           timeToAction: 3000,
@@ -278,6 +312,10 @@ describe('JsonStore - Action Methods', () => {
       mockedFs.readFileSync.mockReturnValue(JSON.stringify(existingData));
 
       const newAction: Action = {
+        sessionId: '123',
+        elementId: 'signup-btn',
+        elementClass: 'btn',
+        scrollPosition: 100,
         name: 'new_action',
         type: 'submit',
         timeToAction: 8000,

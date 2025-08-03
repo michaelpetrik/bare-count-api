@@ -32,7 +32,10 @@ describe('ActionService', () => {
         name: 'newsletter_signup',
         type: 'click',
         timeToAction: 5000,
+        sessionId: 'test-session-1',
         elementId: 'signup-btn',
+        elementClass: 'btn-signup',
+        scrollPosition: 0,
         value: 'test@example.com',
       };
 
@@ -59,6 +62,10 @@ describe('ActionService', () => {
         name: 'cta_click',
         type: 'click',
         timeToAction: 12500,
+        sessionId: 'test-session-2',
+        elementId: 'cta-button',
+        elementClass: 'btn-cta',
+        scrollPosition: 200,
         metadata: { campaign: 'summer_sale', page: 'homepage' },
         userId: 'user123',
       };
@@ -84,6 +91,10 @@ describe('ActionService', () => {
         name: 'basic_click',
         type: 'click',
         timeToAction: 1000,
+        sessionId: 'test-session-3',
+        elementId: 'basic-element',
+        elementClass: 'btn-basic',
+        scrollPosition: 100,
       };
 
       const expectedAction: Action = {
@@ -108,6 +119,10 @@ describe('ActionService', () => {
           type: 'click',
           timeToAction: 5000,
           timestamp: '2025-08-02T10:00:00.000Z',
+          sessionId: 'mock-session-1',
+          elementId: 'test-element',
+          elementClass: 'btn-test',
+          scrollPosition: 0,
         },
       ];
       mockActionStore.getAllActions.mockReturnValue(mockActions);
@@ -135,24 +150,40 @@ describe('ActionService', () => {
           type: 'click',
           timeToAction: 5000,
           timestamp: '2025-08-02T10:00:00.000Z', // today
+          sessionId: 'mock-session-2',
+          elementId: 'newsletter-btn',
+          elementClass: 'btn-newsletter',
+          scrollPosition: 100,
         },
         {
           name: 'cta_click',
           type: 'click',
           timeToAction: 15000,
           timestamp: '2025-08-02T09:00:00.000Z', // today
+          sessionId: 'mock-session-3',
+          elementId: 'cta-btn',
+          elementClass: 'btn-cta',
+          scrollPosition: 200,
         },
         {
           name: 'form_submit',
           type: 'submit',
           timeToAction: 10000,
           timestamp: '2025-08-01T10:00:00.000Z', // yesterday
+          sessionId: 'mock-session-4',
+          elementId: 'form-submit',
+          elementClass: 'btn-submit',
+          scrollPosition: 300,
         },
         {
           name: 'old_action',
           type: 'click',
           timeToAction: 8000,
           timestamp: '2025-07-20T10:00:00.000Z', // older than 7 days
+          sessionId: 'mock-session-5',
+          elementId: 'old-element',
+          elementClass: 'btn-old',
+          scrollPosition: 400,
         },
       ];
       mockActionStore.getAllActions.mockReturnValue(mockActions);
@@ -205,6 +236,10 @@ describe('ActionService', () => {
           type: 'scroll',
           timeToAction: 7500,
           timestamp: '2025-08-02T10:00:00.000Z',
+          sessionId: 'mock-session-6',
+          elementId: 'scroll-element',
+          elementClass: 'scrollable',
+          scrollPosition: 500,
         },
       ];
       mockActionStore.getAllActions.mockReturnValue(mockActions);
@@ -233,18 +268,30 @@ describe('ActionService', () => {
           type: 'click',
           timeToAction: 1000,
           timestamp: '2025-08-02T10:00:00.000Z',
+          sessionId: 'mock-session-7',
+          elementId: 'click1-element',
+          elementClass: 'btn-click1',
+          scrollPosition: 100,
         },
         {
           name: 'submit1',
           type: 'submit',
           timeToAction: 2000,
           timestamp: '2025-08-02T10:00:00.000Z',
+          sessionId: 'mock-session-8',
+          elementId: 'submit1-element',
+          elementClass: 'btn-submit1',
+          scrollPosition: 200,
         },
         {
           name: 'click2',
           type: 'click',
           timeToAction: 3000,
           timestamp: '2025-08-02T10:00:00.000Z',
+          sessionId: 'mock-session-9',
+          elementId: 'click2-element',
+          elementClass: 'btn-click2',
+          scrollPosition: 300,
         },
       ];
       mockActionStore.getAllActions.mockReturnValue(mockActions);
@@ -267,6 +314,10 @@ describe('ActionService', () => {
           type: 'click',
           timeToAction: 1000,
           timestamp: '2025-08-02T10:00:00.000Z',
+          sessionId: 'mock-session-10',
+          elementId: 'click1-element-2',
+          elementClass: 'btn-click1-2',
+          scrollPosition: 100,
         },
       ];
       mockActionStore.getAllActions.mockReturnValue(mockActions);
@@ -288,18 +339,30 @@ describe('ActionService', () => {
           type: 'click',
           timeToAction: 1000,
           timestamp: '2025-08-02T09:00:00.000Z',
+          sessionId: 'mock-session-11',
+          elementId: 'newsletter1-element',
+          elementClass: 'btn-newsletter1',
+          scrollPosition: 100,
         },
         {
           name: 'cta_click',
           type: 'click',
           timeToAction: 2000,
           timestamp: '2025-08-02T10:00:00.000Z',
+          sessionId: 'mock-session-12',
+          elementId: 'cta1-element',
+          elementClass: 'btn-cta1',
+          scrollPosition: 200,
         },
         {
           name: 'newsletter_signup',
           type: 'click',
           timeToAction: 3000,
           timestamp: '2025-08-02T11:00:00.000Z',
+          sessionId: 'mock-session-13',
+          elementId: 'newsletter2-element',
+          elementClass: 'btn-newsletter2',
+          scrollPosition: 300,
         },
       ];
       mockActionStore.getAllActions.mockReturnValue(mockActions);
@@ -324,18 +387,30 @@ describe('ActionService', () => {
           type: 'click',
           timeToAction: 1000,
           timestamp: '2025-08-01T10:00:00.000Z', // within range
+          sessionId: 'mock-session-14',
+          elementId: 'action1-element',
+          elementClass: 'btn-action1',
+          scrollPosition: 100,
         },
         {
           name: 'action2',
           type: 'click',
           timeToAction: 2000,
           timestamp: '2025-08-02T10:00:00.000Z', // within range
+          sessionId: 'mock-session-15',
+          elementId: 'action2-element',
+          elementClass: 'btn-action2',
+          scrollPosition: 200,
         },
         {
           name: 'action3',
           type: 'click',
           timeToAction: 3000,
           timestamp: '2025-08-05T10:00:00.000Z', // outside range
+          sessionId: 'mock-session-16',
+          elementId: 'action3-element',
+          elementClass: 'btn-action3',
+          scrollPosition: 300,
         },
       ];
       mockActionStore.getAllActions.mockReturnValue(mockActions);
@@ -360,6 +435,10 @@ describe('ActionService', () => {
           type: 'click',
           timeToAction: 1000,
           timestamp: '2025-08-01T10:00:00.000Z',
+          sessionId: 'mock-session-17',
+          elementId: 'action1-element-2',
+          elementClass: 'btn-action1-2',
+          scrollPosition: 100,
         },
       ];
       mockActionStore.getAllActions.mockReturnValue(mockActions);

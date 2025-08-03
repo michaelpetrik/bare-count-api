@@ -16,7 +16,11 @@ describe('counterController', () => {
       const response = await request(app).get('/test').expect(200);
 
       // Assert
-      expect(response.text).toBe('done');
+      expect(response.body).toMatchObject({
+        success: true,
+        message: 'Visit recorded successfully',
+      });
+      expect(response.body.sessionId).toMatch(/^session_[a-f0-9-]+$/);
     });
 
     it('should record a visit when called', async () => {
@@ -25,7 +29,11 @@ describe('counterController', () => {
 
       // Assert
       expect(response.status).toBe(200);
-      expect(response.text).toBe('done');
+      expect(response.body).toMatchObject({
+        success: true,
+        message: 'Visit recorded successfully',
+      });
+      expect(response.body.sessionId).toMatch(/^session_[a-f0-9-]+$/);
     });
   });
 });

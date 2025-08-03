@@ -1,4 +1,5 @@
 export interface Visit {
+  sessionId: string;
   timestamp: string;
   country?: string;
   browser?: string;

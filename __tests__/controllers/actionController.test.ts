@@ -101,6 +101,9 @@ describe('Action Controller', () => {
         name: 'newsletter_signup',
         type: 'click',
         timeToAction: 5000,
+        elementId: 'newsletter-button',
+        elementClass: 'btn-newsletter',
+        scrollPosition: 0,
       };
 
       // Act
@@ -110,10 +113,11 @@ describe('Action Controller', () => {
         .expect(200);
 
       // Assert
-      expect(response.body).toEqual({
+      expect(response.body).toMatchObject({
         success: true,
         message: 'Action tracked successfully',
       });
+      expect(response.body.sessionId).toMatch(/^session_[a-f0-9-]+$/);
     });
 
     it('should track action with optional parameters', async () => {
@@ -124,6 +128,7 @@ describe('Action Controller', () => {
         timeToAction: 12500,
         elementId: 'main-cta',
         elementClass: 'btn-primary',
+        scrollPosition: 250,
         value: 'Get Started',
         userId: 'user123',
         sessionId: 'sess456',
@@ -140,10 +145,11 @@ describe('Action Controller', () => {
         .expect(200);
 
       // Assert
-      expect(response.body).toEqual({
+      expect(response.body).toMatchObject({
         success: true,
         message: 'Action tracked successfully',
       });
+      expect(response.body.sessionId).toBe('sess456');
     });
 
     it('should return 400 when name is missing', async () => {
@@ -285,6 +291,9 @@ describe('Action Controller', () => {
           name: `test_${type}`,
           type,
           timeToAction: 5000,
+          elementId: `test-element-${type}`,
+          elementClass: `btn-${type}`,
+          scrollPosition: 100,
         };
 
         const response = await request(app)
@@ -292,10 +301,11 @@ describe('Action Controller', () => {
           .send(actionData)
           .expect(200);
 
-        expect(response.body).toEqual({
+        expect(response.body).toMatchObject({
           success: true,
           message: 'Action tracked successfully',
         });
+        expect(response.body.sessionId).toMatch(/^session_[a-f0-9-]+$/);
       }
     });
 
@@ -305,6 +315,9 @@ describe('Action Controller', () => {
         name: 'immediate_action',
         type: 'click',
         timeToAction: 0,
+        elementId: 'immediate-button',
+        elementClass: 'btn-immediate',
+        scrollPosition: 0,
       };
 
       // Act
@@ -314,10 +327,11 @@ describe('Action Controller', () => {
         .expect(200);
 
       // Assert
-      expect(response.body).toEqual({
+      expect(response.body).toMatchObject({
         success: true,
         message: 'Action tracked successfully',
       });
+      expect(response.body.sessionId).toMatch(/^session_[a-f0-9-]+$/);
     });
 
     it('should handle large timeToAction values', async () => {
@@ -326,6 +340,9 @@ describe('Action Controller', () => {
         name: 'delayed_action',
         type: 'click',
         timeToAction: 3600000, // 1 hour in milliseconds
+        elementId: 'delayed-button',
+        elementClass: 'btn-delayed',
+        scrollPosition: 200,
       };
 
       // Act
@@ -335,10 +352,11 @@ describe('Action Controller', () => {
         .expect(200);
 
       // Assert
-      expect(response.body).toEqual({
+      expect(response.body).toMatchObject({
         success: true,
         message: 'Action tracked successfully',
       });
+      expect(response.body.sessionId).toMatch(/^session_[a-f0-9-]+$/);
     });
   });
 
@@ -457,6 +475,9 @@ describe('Action Controller', () => {
         name: 'test_action',
         type: 'click',
         timeToAction: 5000,
+        elementId: 'test-element',
+        elementClass: 'btn-test',
+        scrollPosition: 150,
       };
 
       // Act
@@ -466,10 +487,11 @@ describe('Action Controller', () => {
         .expect(200);
 
       // Assert
-      expect(response.body).toEqual({
+      expect(response.body).toMatchObject({
         success: true,
         message: 'Action tracked successfully',
       });
+      expect(response.body.sessionId).toMatch(/^session_[a-f0-9-]+$/);
     });
 
     it('should handle malformed JSON gracefully', async () => {

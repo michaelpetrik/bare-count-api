@@ -27,6 +27,7 @@ describe('CounterService', () => {
       const fixedTime = '2024-12-25T10:00:00.000Z';
       mockTimeProvider.getCurrentTimeIso.mockReturnValue(fixedTime);
       const visitData = {
+        sessionId: 'test-session-visit1',
         timestamp: fixedTime,
         country: 'CZ',
         browser: 'Chrome',
@@ -50,11 +51,13 @@ describe('CounterService', () => {
       const firstTime = '2024-01-01T00:00:00.000Z';
       const secondTime = '2024-12-31T23:59:59.999Z';
       const firstVisit = {
+        sessionId: 'test-session-visit2',
         timestamp: firstTime,
         country: 'US',
         browser: 'Firefox',
       };
       const secondVisit = {
+        sessionId: 'test-session-visit3',
         timestamp: secondTime,
         country: 'DE',
         browser: 'Safari',
@@ -75,8 +78,14 @@ describe('CounterService', () => {
     it('should return the correct visit counts', () => {
       // Arrange
       const visits = [
-        { timestamp: '2024-01-01T00:00:00.000Z' },
-        { timestamp: '2024-01-02T00:00:00.000Z' },
+        {
+          sessionId: 'test-session-visit4',
+          timestamp: '2024-01-01T00:00:00.000Z',
+        },
+        {
+          sessionId: 'test-session-visit5',
+          timestamp: '2024-01-02T00:00:00.000Z',
+        },
       ];
       mockStore.getAllVisits.mockReturnValue(visits);
     });
@@ -87,8 +96,11 @@ describe('CounterService', () => {
       const fixedTime = '2025-09-09T09:00:00.000Z';
       mockTimeProvider.getCurrentTimeIso.mockReturnValue(fixedTime);
       const visits = [
-        { timestamp: fixedTime },
-        { timestamp: '2024-01-02T00:00:00.000Z' },
+        { sessionId: 'test-session-visit6', timestamp: fixedTime },
+        {
+          sessionId: 'test-session-visit7',
+          timestamp: '2024-01-02T00:00:00.000Z',
+        },
       ];
       mockStore.getAllVisits.mockReturnValue(visits);
 
@@ -104,14 +116,38 @@ describe('CounterService', () => {
     const fixedTime = '2025-09-09T09:00:00.000Z';
     mockTimeProvider.getCurrentTimeIso.mockReturnValue(fixedTime);
     const visits = [
-      { timestamp: '2025-09-08T09:00:00.000Z' },
-      { timestamp: '2025-09-07T09:00:00.000Z' },
-      { timestamp: '2025-09-06T09:00:00.000Z' },
-      { timestamp: '2025-09-05T09:00:00.000Z' },
-      { timestamp: '2025-09-04T09:00:00.000Z' },
-      { timestamp: '2025-09-03T09:00:00.000Z' },
-      { timestamp: '2025-09-02T09:00:00.000Z' },
-      { timestamp: '2025-09-01T09:00:00.000Z' },
+      {
+        sessionId: 'test-session-visit8',
+        timestamp: '2025-09-08T09:00:00.000Z',
+      },
+      {
+        sessionId: 'test-session-visit9',
+        timestamp: '2025-09-07T09:00:00.000Z',
+      },
+      {
+        sessionId: 'test-session-visit10',
+        timestamp: '2025-09-06T09:00:00.000Z',
+      },
+      {
+        sessionId: 'test-session-visit11',
+        timestamp: '2025-09-05T09:00:00.000Z',
+      },
+      {
+        sessionId: 'test-session-visit12',
+        timestamp: '2025-09-04T09:00:00.000Z',
+      },
+      {
+        sessionId: 'test-session-visit13',
+        timestamp: '2025-09-03T09:00:00.000Z',
+      },
+      {
+        sessionId: 'test-session-visit14',
+        timestamp: '2025-09-02T09:00:00.000Z',
+      },
+      {
+        sessionId: 'test-session-visit15',
+        timestamp: '2025-09-01T09:00:00.000Z',
+      },
     ];
     mockStore.getAllVisits.mockReturnValue(visits);
 

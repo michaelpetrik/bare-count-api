@@ -35,8 +35,8 @@ describe('DefaultTimeProvider', () => {
       // Act
       const first = provider.getCurrentTimeIso();
 
-      // Wait a tiny bit to ensure different timestamps
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      // Wait a bit longer to ensure different timestamps
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       const second = provider.getCurrentTimeIso();
 

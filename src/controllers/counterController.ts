@@ -3,6 +3,7 @@ import { CounterService } from '../services/counterService';
 import { ActionService } from '../services/actionService';
 import { JsonStore } from '../storage/jsonStore';
 import { DefaultTimeProvider } from '../services/implementations/defaultTimeProvider';
+import { IdGenerator } from '../utils/idGenerator';
 import geoip from 'geoip-lite';
 import { UAParser } from 'ua-parser-js';
 
@@ -37,7 +38,11 @@ export const handleHit = (_req: Request, res: Response) => {
 
   const screen = _req.query.screen as string | undefined;
 
+  // Generate enterprise-level unique session ID for visit
+  const sessionId = IdGenerator.generateSessionId();
+
   counterService.recordVisit({
+    sessionId,
     timestamp,
     country,
     browser,
@@ -47,7 +52,13 @@ export const handleHit = (_req: Request, res: Response) => {
     referrer,
     screen,
   });
-  res.send('done');
+
+  // Return sessionId so frontend can store it
+  res.json({
+    success: true,
+    sessionId: sessionId,
+    message: 'Visit recorded successfully',
+  });
 };
 
 export const getHitStats = (_req: Request, res: Response) => {
@@ -57,7 +68,18 @@ export const getHitStats = (_req: Request, res: Response) => {
 
 // Action tracking endpoints
 export const trackAction = (req: Request, res: Response) => {
-  const { name, type, timeToAction, ...additionalParams } = req.body;
+  const timestamp = timeProvider.getCurrentTimeIso();
+
+  const {
+    name,
+    type,
+    timeToAction,
+    sessionId: providedSessionId,
+    elementId,
+    elementClass,
+    scrollPosition,
+    ...additionalParams
+  } = req.body;
 
   // Validate required parameters
   if (!name || !type || typeof timeToAction !== 'number') {
@@ -67,35 +89,35 @@ export const trackAction = (req: Request, res: Response) => {
     });
   }
 
-  // Extract browser/device info similar to visits
-  const ip =
-    req.headers['x-forwarded-for'] ||
-    req.socket.remoteAddress ||
-    (req.ip as string);
+  if (!elementId || !elementClass || typeof scrollPosition !== 'number') {
+    return res.status(400).json({
+      error:
+        'Missing required parameters: elementId, elementClass, and scrollPosition are required',
+    });
+  }
 
-  const geo = geoip.lookup(ip as string);
-  const country = geo?.country;
+  // Use provided sessionId or generate new enterprise-level UUID
+  const sessionId = providedSessionId || IdGenerator.generateSessionId();
 
-  const parser = new UAParser();
-  const result = parser.setUA(req.headers['user-agent'] || '').getResult();
-  const browser = result.browser.name;
-  const os = result.os.name;
-  const deviceType = result.device.type;
-
-  // Record the action with all provided and extracted data
+  // Record the action with all required and provided data
   actionService.recordAction({
+    sessionId,
+    timestamp,
     name,
     type,
     timeToAction,
-    country,
-    browser,
-    os,
-    deviceType,
+    elementId,
+    elementClass,
+    scrollPosition,
     url: req.headers['referer'],
-    ...additionalParams, // spread any additional parameters from request body
+    ...additionalParams, // spread any additional optional parameters
   });
 
-  res.json({ success: true, message: 'Action tracked successfully' });
+  res.json({
+    success: true,
+    sessionId: sessionId,
+    message: 'Action tracked successfully',
+  });
 };
 
 export const getActionStats = (_req: Request, res: Response) => {
