@@ -70,14 +70,22 @@ jobs:
           docker compose ps
           docker stats counter-api --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" || true
 
-          # Test health endpoint (inside container)
-          sleep 10
+          # Test health endpoint using Docker's built-in health check
+          echo "⏳ Waiting for container health check..."
+          sleep 15
+
+          # Check Docker health status
+          HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' counter-api 2>/dev/null || echo "unknown")
           API_PORT=$(grep "PORT=" .env | cut -d'=' -f2 || echo "3000")
-          if docker compose exec -T counter-api curl -f http://localhost:${API_PORT}/health > /dev/null 2>&1; then
+
+          if [ "$HEALTH_STATUS" = "healthy" ]; then
             echo "✅ Counter API container is healthy on port ${API_PORT}!"
           else
-            echo "❌ Counter API health check failed on port ${API_PORT}!"
+            echo "❌ Counter API health check failed! Status: ${HEALTH_STATUS}"
+            echo "🔍 Container logs:"
             docker compose logs counter-api --tail=20
+            echo "🔍 Health check logs:"
+            docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' counter-api 2>/dev/null || echo "No health logs available"
             exit 1
           fi
           EOF

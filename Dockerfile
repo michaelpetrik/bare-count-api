@@ -21,12 +21,12 @@ COPY --chown=node:node ./tracker.js ./tracker.js
 # Switch to non-root user
 USER node
 
-# Expose port
-EXPOSE 3000
+# Expose port (use environment variable or default to 3000)
+EXPOSE ${PORT:-3000}
 
-# Simple health check
+# Simple health check using environment variable
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+  CMD node -e "const port=process.env.PORT||3000;require('http').get(\`http://localhost:\${port}/health\`,(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
 # Start the application
 CMD ["npm", "start"] 

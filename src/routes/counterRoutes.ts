@@ -1,21 +1,12 @@
 import { Router } from 'express';
-import {
-  handleHit,
-  getHitStats,
-  trackAction,
-  getActionStats,
-  getActions,
-} from '../controllers/counterController';
+import { handleHit, trackAction } from '../controllers/counterController';
 
 const router = Router();
 
-// Visit tracking routes
+// Visit tracking routes - only data collection
 router.get('/hit', handleHit);
-router.get('/stats', getHitStats);
 
-// Action tracking routes
+// Action tracking routes - only data collection
 router.post('/action', trackAction);
-router.get('/action/stats', getActionStats);
-router.get('/actions', getActions);
 
 export default router;

@@ -48,6 +48,15 @@ app.use((req, res, next) => {
   const now = Date.now();
   const key = `${ip}`;
 
+  // Skip rate limiting for tracker.js and health check gets higher limit
+  if (req.path === '/tracker.js') {
+    next();
+    return;
+  }
+
+  const isHealthCheck = req.path === '/health';
+  const maxRequests = isHealthCheck ? 300 : RATE_LIMIT_MAX_REQUESTS; // 5 requests per second for health
+
   if (!rateLimitMap.has(key)) {
     rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
   } else {
@@ -58,7 +67,7 @@ app.use((req, res, next) => {
       limit.resetTime = now + RATE_LIMIT_WINDOW;
     } else {
       limit.count++;
-      if (limit.count > RATE_LIMIT_MAX_REQUESTS) {
+      if (limit.count > maxRequests) {
         res.status(429).json({
           error: 'Too Many Requests',
           message: 'Rate limit exceeded. Try again later.',
@@ -83,6 +92,49 @@ setInterval(() => {
 
 // JSON parsing with size limits
 app.use(express.json({ limit: '10kb' }));
+
+// Security: Block access to sensitive files and directories
+app.use((req, res, next) => {
+  const blockedExtensions = ['.json', '.ts', '.js', '.env', '.log', '.txt'];
+  const blockedPaths = [
+    '/data/',
+    '/src/',
+    '/node_modules/',
+    '/.git/',
+    '/storage',
+  ];
+  const blockedFiles = [
+    'package.json',
+    'package-lock.json',
+    'tsconfig.json',
+    'storage.json',
+    '.env',
+  ];
+
+  // Check for blocked extensions
+  const hasBlockedExtension = blockedExtensions.some((ext) =>
+    req.path.endsWith(ext)
+  );
+
+  // Check for blocked paths
+  const hasBlockedPath = blockedPaths.some((path) => req.path.startsWith(path));
+
+  // Check for specific blocked files
+  const isBlockedFile = blockedFiles.some((file) => req.path.includes(file));
+
+  // Allow tracker.js specifically
+  if (req.path === '/tracker.js') {
+    next();
+    return;
+  }
+
+  if (hasBlockedExtension || hasBlockedPath || isBlockedFile) {
+    res.status(404).json({ error: 'Not Found' });
+    return;
+  }
+
+  next();
+});
 
 // Serve tracker.js with proper headers
 app.get('/tracker.js', (req, res) => {
