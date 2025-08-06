@@ -70,39 +70,23 @@ jobs:
           docker compose ps
           docker stats counter-api --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" || true
 
-                    # Test health endpoint using Docker's built-in health check
-          echo "⏳ Waiting for container health check..."
+                              # Quick health check - fail fast
+          echo "⏳ Quick health check..."
+          sleep 10
+
+          HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' counter-api 2>/dev/null || echo "unknown")
           API_PORT=$(grep "PORT=" .env | cut -d'=' -f2 || echo "3000")
-          echo "📍 Expected API port: ${API_PORT}"
 
-          # Show container status first
-          echo "🔍 Container status:"
-          docker compose ps counter-api
-
-          # Wait longer for slow starts
-          sleep 20
-
-          # Check Docker health status with retries
-          for i in {1..6}; do
-            HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' counter-api 2>/dev/null || echo "unknown")
-            echo "🏥 Health check attempt ${i}/6: ${HEALTH_STATUS}"
-            
-            if [ "$HEALTH_STATUS" = "healthy" ]; then
-              echo "✅ Counter API container is healthy on port ${API_PORT}!"
-              break
-            elif [ "$i" -eq 6 ]; then
-              echo "❌ Counter API health check failed after 6 attempts! Final status: ${HEALTH_STATUS}"
-              echo "🔍 Container logs:"
-              docker compose logs counter-api --tail=30
-              echo "🔍 Health check logs:"
-              docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' counter-api 2>/dev/null || echo "No health logs available"
-              echo "🔍 Container environment:"
-              docker compose exec -T counter-api env | grep -E "(PORT|NODE_ENV)" || echo "Could not get env vars"
-              exit 1
-            else
-              sleep 10
-            fi
-          done
+          if [ "$HEALTH_STATUS" = "healthy" ]; then
+            echo "✅ Counter API container is healthy on port ${API_PORT}!"
+          else
+            echo "❌ Counter API health check failed! Status: ${HEALTH_STATUS}"
+            echo "🔍 Container logs:"
+            docker compose logs counter-api --tail=10
+            echo "🔍 Health check logs:"
+            docker inspect --format='{{range .State.Health.Log}}{{.Output}}{{end}}' counter-api 2>/dev/null || echo "No health logs available"
+            exit 1
+          fi
           EOF
 
       - name: Verify deployment

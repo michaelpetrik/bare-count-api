@@ -12,7 +12,7 @@ services:
       - RATE_LIMIT_WINDOW=60000
       - RATE_LIMIT_MAX_REQUESTS=100
     volumes:
-      - ./storage.json:/app/storage.json
+      - ./storage.json:/app/storage.json:rw
     networks:
       - web
     # Security hardening
