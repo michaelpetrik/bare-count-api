@@ -5,6 +5,8 @@ services:
     build: .
     container_name: counter-api
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - PORT=3000
