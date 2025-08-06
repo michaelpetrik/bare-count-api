@@ -1,30 +1,6 @@
 version: '3.8'
 
 services:
-  traefik:
-    image: traefik:v3.0
-    container_name: traefik
-    restart: unless-stopped
-    command:
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-admin@example.com}
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
-      - --api.dashboard=true
-      - --api.insecure=true
-    ports:
-      - '80:80'
-      - '443:443'
-      - '8080:8080'
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - traefik-certs:/letsencrypt
-    networks:
-      - web
-
   counter-api:
     build: .
     container_name: counter-api
@@ -32,23 +8,48 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - RATE_LIMIT_WINDOW=60000
+      - RATE_LIMIT_MAX_REQUESTS=100
     volumes:
       - ./storage.json:/app/storage.json
     networks:
       - web
-    depends_on:
-      - traefik
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=100m
     labels:
       - 'traefik.enable=true'
+      # HTTP to HTTPS redirect
       - 'traefik.http.routers.api.rule=Host(`${API_DOMAIN:-api.localhost}`)'
       - 'traefik.http.routers.api.entrypoints=web'
+      - 'traefik.http.routers.api.middlewares=api-https-redirect'
+      - 'traefik.http.middlewares.api-https-redirect.redirectscheme.scheme=https'
+      # HTTPS with security headers
       - 'traefik.http.routers.api-secure.rule=Host(`${API_DOMAIN:-api.localhost}`)'
       - 'traefik.http.routers.api-secure.entrypoints=websecure'
       - 'traefik.http.routers.api-secure.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.api-secure.middlewares=api-security-headers'
       - 'traefik.http.services.api.loadbalancer.server.port=3000'
-
-volumes:
-  traefik-certs:
+      # Security headers middleware
+      - 'traefik.http.middlewares.api-security-headers.headers.customrequestheaders.X-Forwarded-Proto=https'
+      - 'traefik.http.middlewares.api-security-headers.headers.sslredirect=true'
+      - 'traefik.http.middlewares.api-security-headers.headers.stsincludesubdomains=true'
+      - 'traefik.http.middlewares.api-security-headers.headers.stspreload=true'
+      - 'traefik.http.middlewares.api-security-headers.headers.stsseconds=31536000'
+      - 'traefik.http.middlewares.api-security-headers.headers.framedeny=true'
+      - 'traefik.http.middlewares.api-security-headers.headers.contentTypeNosniff=true'
+      - 'traefik.http.middlewares.api-security-headers.headers.browserXssFilter=true'
+      - 'traefik.http.middlewares.api-security-headers.headers.referrerPolicy=strict-origin-when-cross-origin'
 
 networks:
   web:
+    external: true

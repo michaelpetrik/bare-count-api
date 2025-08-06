@@ -1,0 +1,101 @@
+name: Deploy Counter API to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PORT: 2222
+      TARGET_DIR: mini-counter-api
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Sync files to VPS
+        run: |
+          rsync -avz \
+          --exclude '.git' \
+          --exclude '.cursor' \
+          --exclude '.github' \
+          --exclude 'README.md' \
+          --exclude 'API-DOCUMENTATION.md' \
+          --exclude 'ENTERPRISE-DEPLOYMENT.md' \
+          --exclude 'TRACKER-README.md' \
+          --exclude 'DOCKER-README.md' \
+          --exclude 'node_modules' \
+          --exclude '.DS_Store' \
+          --exclude '.vscode' \
+          --exclude '__tests__' \
+          --exclude 'tsconfig.json' \
+          --exclude 'package-lock.json' \
+          --delete \
+          -e "ssh -p $SSH_PORT -o StrictHostKeyChecking=no" \
+          ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/$TARGET_DIR
+
+      - name: Deploy Counter API on VPS
+        run: |
+          ssh -p $SSH_PORT -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          cd ~/${{ env.TARGET_DIR }}
+
+          # Create .env if doesn't exist
+          if [ ! -f .env ]; then
+            cp env.example .env
+            echo "⚠️ Created .env from template - configure before next deployment!"
+          fi
+
+          # Make deploy script executable
+          chmod +x deploy.sh
+
+          # Stop existing containers
+          docker compose down || true
+
+          # Clean up old images to save space
+          docker image prune -f
+
+          # Deploy with restart
+          ./deploy.sh restart
+
+          # Show final status
+          echo "=== Deployment Status ==="
+          docker compose ps
+          docker stats counter-api --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" || true
+
+          # Test health endpoint (inside container)
+          sleep 10
+          API_PORT=$(grep "PORT=" .env | cut -d'=' -f2 || echo "3000")
+          if docker compose exec -T counter-api curl -f http://localhost:${API_PORT}/health > /dev/null 2>&1; then
+            echo "✅ Counter API container is healthy on port ${API_PORT}!"
+          else
+            echo "❌ Counter API health check failed on port ${API_PORT}!"
+            docker compose logs counter-api --tail=20
+            exit 1
+          fi
+          EOF
+
+      - name: Verify deployment
+        run: |
+          echo "🎉 Deployment completed successfully!"
+          echo "📊 API should be available at: https://${{ secrets.API_DOMAIN }}"
+          echo "📈 Tracker: https://${{ secrets.API_DOMAIN }}/tracker.js"
+
+          # External health check through Traefik
+          echo "🔍 Testing external API endpoint..."
+          sleep 5
+          if curl -f -s "https://${{ secrets.API_DOMAIN }}/health" > /dev/null; then
+            echo "✅ External API endpoint is reachable through Traefik!"
+          else
+            echo "⚠️ External endpoint not yet available (DNS/SSL might be propagating)"
+            echo "🔧 Check manually: https://${{ secrets.API_DOMAIN }}/health"
+          fi
+
+          echo "🔍 Check status: ssh -p $SSH_PORT ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 'cd $TARGET_DIR && docker compose ps'"

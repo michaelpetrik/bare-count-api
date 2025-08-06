@@ -14,8 +14,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
-# Copy built app
+# Copy built app and static files
 COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --chown=node:node ./tracker.js ./tracker.js
 
 # Switch to non-root user
 USER node
