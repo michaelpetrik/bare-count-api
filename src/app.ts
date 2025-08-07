@@ -107,7 +107,6 @@ app.use((req, res, next) => {
     'package.json',
     'package-lock.json',
     'tsconfig.json',
-    'storage.json',
     '.env',
   ];
 

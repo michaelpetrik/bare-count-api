@@ -19,7 +19,7 @@ COPY --from=builder --chown=node:node /app/dist ./dist
 COPY --chown=node:node ./tracker.js ./tracker.js
 
 # Create data directory for storage (writable in read-only container)
-RUN mkdir -p /app/data && chown node:node /app/data
+RUN mkdir -p /app/data && chown node:node /app/data && chmod 755 /app/data
 
 # Switch to non-root user
 USER node
