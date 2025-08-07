@@ -5,7 +5,7 @@ import { ActionStore } from './interfaces/actionStore';
 import { Visit } from '../types/visit';
 import { Action } from '../types/action';
 
-const DEFAULT_FILE_PATH = path.join(__dirname, '../../storage.json');
+const DEFAULT_FILE_PATH = path.join(__dirname, '../../data/storage.json');
 
 interface StorageData {
   visits: Visit[];
