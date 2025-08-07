@@ -47,10 +47,14 @@ jobs:
           ssh -p $SSH_PORT -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
           cd ~/${{ env.TARGET_DIR }}
 
-          # Create .env if doesn't exist
+          # Check .env exists (create from template only on first deployment)
           if [ ! -f .env ]; then
             cp env.example .env
-            echo "⚠️ Created .env from template - configure before next deployment!"
+            echo "⚠️ Created .env from template - CONFIGURE IT BEFORE NEXT DEPLOYMENT!"
+            echo "🔧 Edit .env file with your actual values and run deployment again."
+            exit 1
+          else
+            echo "✅ .env file exists - using existing configuration"
           fi
 
           # Make deploy script executable
@@ -62,8 +66,8 @@ jobs:
           # Clean up old images to save space
           docker image prune -f
 
-          # Deploy with restart
-          ./deploy.sh restart
+          # Deploy with rebuild to use updated code and env
+          ./deploy.sh start
 
           # Show final status
           echo "=== Deployment Status ==="
