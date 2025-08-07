@@ -170,13 +170,18 @@ app.get('/tracker.js', (req, res) => {
   }
 });
 
-// Health check endpoint
+// Health check endpoint - optimized for fast response
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
   });
+});
+
+// Readiness check endpoint - for faster startup detection
+app.get('/ready', (req, res) => {
+  res.status(200).send('OK');
 });
 
 // API routes

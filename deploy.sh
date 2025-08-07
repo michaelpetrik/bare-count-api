@@ -37,6 +37,25 @@ log_error() {
     echo -e "${RED}❌ $1${NC}"
 }
 
+# Wait for service to be ready
+wait_for_ready() {
+    local max_attempts=30
+    local attempt=1
+    
+    log_info "Waiting for service to be ready..."
+    while [ $attempt -le $max_attempts ]; do
+        if docker compose exec -T counter-api wget -q --spider http://localhost:3000/ready 2>/dev/null; then
+            log_success "Service is ready! (${attempt}s)"
+            return 0
+        fi
+        sleep 1
+        attempt=$((attempt + 1))
+    done
+    
+    log_error "Service failed to become ready within ${max_attempts} seconds"
+    return 1
+}
+
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
     log_error "Docker is not running. Please start Docker first."
@@ -67,19 +86,32 @@ case "${1:-start}" in
         
         # Create necessary directories and storage file
         mkdir -p data
-        touch data/storage.json
+        if [ ! -f data/storage.json ]; then
+            echo '{"visits":[],"actions":[]}' > data/storage.json
+            log_info "Created initial storage.json"
+        fi
         
-        # Build counter API
+        # Build only if needed or forced
         if [ "$CLEAN_BUILD" = true ]; then
+            log_info "Clean build requested..."
             docker compose build --no-cache --pull
-        else
+        elif [ ! "$(docker images -q counter-api 2> /dev/null)" ]; then
+            log_info "No existing image found, building..."
             docker compose build
+        else
+            log_info "Using existing image (use --clean to rebuild)"
         fi
         
         # Start services
         docker compose up -d
         
-        log_success "Bare Count API is now running!"
+        # Wait for readiness
+        if wait_for_ready; then
+            log_success "Bare Count API is now running!"
+        else
+            log_error "Deployment failed - service not ready"
+            exit 1
+        fi
         log_info "Available endpoints:"
         echo "  📊 API: https://$(grep API_DOMAIN .env | cut -d'=' -f2)"
         echo "  📈 Tracker: https://$(grep API_DOMAIN .env | cut -d'=' -f2)/tracker.js"
@@ -96,9 +128,7 @@ case "${1:-start}" in
         
     "restart")
         log_info "Restarting Bare Count API..."
-        docker compose down
-        sleep 2
-        docker compose up -d
+        docker compose restart counter-api
         log_success "Services restarted!"
         ;;
         
