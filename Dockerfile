@@ -27,8 +27,8 @@ USER node
 # Expose port (use environment variable or default to 3000)
 EXPOSE ${PORT:-3000}
 
-# Simple health check - fail fast
-HEALTHCHECK --interval=30s --timeout=5s --retries=2 \
+# Health check with reasonable startup time
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD node -e "const port=process.env.PORT||3000;require('http').get(\`http://localhost:\${port}/health\`,(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
 # Start the application

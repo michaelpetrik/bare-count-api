@@ -70,9 +70,9 @@ jobs:
           docker compose ps
           docker stats counter-api --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}" || true
 
-                              # Quick health check - fail fast
+                              # Quick health check with more time for startup
           echo "⏳ Quick health check..."
-          sleep 10
+          sleep 30
 
           HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' counter-api 2>/dev/null || echo "unknown")
           API_PORT=$(grep "PORT=" .env | cut -d'=' -f2 || echo "3000")

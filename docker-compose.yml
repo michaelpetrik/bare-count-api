@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   counter-api:
     build: .
@@ -15,6 +13,19 @@ services:
       - '${PORT:-3000}:${PORT:-3000}'
     volumes:
       - ./data:/app/data:rw
+    # Health check configuration
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "const port=process.env.PORT||3000;require('http').get(`http://localhost:${port}/health`,(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
     # For direct access without Traefik, uncomment the line below:
     # networks: []
     networks:
