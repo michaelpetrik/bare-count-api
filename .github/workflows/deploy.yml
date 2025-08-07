@@ -38,6 +38,9 @@ jobs:
           --exclude '__tests__' \
           --exclude 'tsconfig.json' \
           --exclude 'package-lock.json' \
+          --exclude 'data' \
+          --exclude 'data/*' \
+          --exclude '.env' \
           --delete \
           -e "ssh -p $SSH_PORT -o StrictHostKeyChecking=no" \
           ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/$TARGET_DIR
