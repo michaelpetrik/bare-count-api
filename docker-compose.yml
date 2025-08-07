@@ -56,7 +56,7 @@ services:
       - 'traefik.http.routers.api-secure.entrypoints=websecure'
       - 'traefik.http.routers.api-secure.tls.certresolver=letsencrypt'
       - 'traefik.http.routers.api-secure.middlewares=api-security-headers'
-      - 'traefik.http.services.api.loadbalancer.server.port=${PORT:-3000}'
+      - 'traefik.http.services.api.loadbalancer.server.port=3000'
       # Security headers middleware
       - 'traefik.http.middlewares.api-security-headers.headers.customrequestheaders.X-Forwarded-Proto=https'
       - 'traefik.http.middlewares.api-security-headers.headers.sslredirect=true'

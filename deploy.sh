@@ -65,9 +65,9 @@ case "${1:-start}" in
     "start")
         log_info "Starting Bare Count API in production mode..."
         
-        # Create necessary directories
+        # Create necessary directories and storage file
         mkdir -p data
-        touch storage.json
+        touch data/storage.json
         
         # Build counter API
         if [ "$CLEAN_BUILD" = true ]; then
@@ -124,7 +124,7 @@ case "${1:-start}" in
         log_info "Creating backup..."
         BACKUP_DIR="backups/$(date +%Y%m%d_%H%M%S)"
         mkdir -p "$BACKUP_DIR"
-        cp storage.json "$BACKUP_DIR/"
+        cp data/storage.json "$BACKUP_DIR/"
         cp .env "$BACKUP_DIR/"
         log_success "Backup created in $BACKUP_DIR"
         ;;

@@ -16,9 +16,13 @@ export class JsonStore implements VisitStore, ActionStore {
   private filePath: string;
 
   private ensureFileExists(): void {
+    console.log('Checking file existence at:', this.filePath);
     if (!fs.existsSync(this.filePath)) {
+      console.log('File does not exist, creating:', this.filePath);
       const initialData: StorageData = { visits: [], actions: [] };
       fs.writeFileSync(this.filePath, JSON.stringify(initialData, null, 2));
+    } else {
+      console.log('File already exists at:', this.filePath);
     }
   }
 
@@ -41,6 +45,7 @@ export class JsonStore implements VisitStore, ActionStore {
 
   constructor(filePath: string = DEFAULT_FILE_PATH) {
     this.filePath = filePath;
+    console.log('JsonStore initialized with path:', this.filePath);
     this.ensureFileExists();
   }
 

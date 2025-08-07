@@ -4,7 +4,7 @@ set -e
 
 case "${1:-}" in
     up)
-        test -f storage.json || echo "[]" > storage.json
+        test -f data/storage.json || echo "[]" > data/storage.json
         test -f .env || cp env.example .env
         docker compose up -d
         echo "Started: http://api.localhost (Dashboard: http://localhost:8080)"
