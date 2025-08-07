@@ -24,8 +24,8 @@ RUN mkdir -p /app/data && chown node:node /app/data && chmod 755 /app/data
 # Switch to non-root user
 USER node
 
-# Expose port (use environment variable or default to 3000)
-EXPOSE ${PORT:-3000}
+# Expose port (fixed port for container)
+EXPOSE 3000
 
 # Health check with reasonable startup time
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
