@@ -49,8 +49,8 @@ services:
       - 'traefik.http.routers.api.rule=Host(`${API_DOMAIN:-api.localhost}`)'
       - 'traefik.http.routers.api.entrypoints=web'
       # Temporarily disable HTTPS redirect for debugging
-      # - 'traefik.http.routers.api.middlewares=api-https-redirect'
-      # - 'traefik.http.middlewares.api-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.api.middlewares=api-https-redirect'
+      - 'traefik.http.middlewares.api-https-redirect.redirectscheme.scheme=https'
       # HTTPS with security headers
       - 'traefik.http.routers.api-secure.rule=Host(`${API_DOMAIN:-api.localhost}`)'
       - 'traefik.http.routers.api-secure.entrypoints=websecure'
@@ -59,7 +59,7 @@ services:
       - 'traefik.http.services.api.loadbalancer.server.port=3000'
       # Security headers middleware
       - 'traefik.http.middlewares.api-security-headers.headers.customrequestheaders.X-Forwarded-Proto=https'
-      - 'traefik.http.middlewares.api-security-headers.headers.sslredirect=true'
+      # - 'traefik.http.middlewares.api-security-headers.headers.sslredirect=true'
       - 'traefik.http.middlewares.api-security-headers.headers.stsincludesubdomains=true'
       - 'traefik.http.middlewares.api-security-headers.headers.stspreload=true'
       - 'traefik.http.middlewares.api-security-headers.headers.stsseconds=31536000'
